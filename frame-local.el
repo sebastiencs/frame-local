@@ -49,10 +49,11 @@
 (defvar frame-local--obarrays nil
   "Plist of obarrays for each frame.")
 
-(defun frame-local--get-obarray (frame &optional create)
-  "Return the obarray associated to FRAME.
-If there is no obarray and CREATE is non-nil, a new obarray is created."
-  (setq frame (window-normalize-frame frame))
+(defvar frame-local--cache nil
+  "Cons of frame and obarray currently used.
+This avoid to search the obarray in `frame-local--obarrays' on every request.")
+
+(defun frame-local--get-obarray-1 (frame &optional create)
   (if (plist-member frame-local--obarrays frame)
       (plist-get frame-local--obarrays frame)
     (when create
@@ -60,6 +61,17 @@ If there is no obarray and CREATE is non-nil, a new obarray is created."
         (setq frame-local--obarrays
               (plist-put frame-local--obarrays frame obarray))
         obarray))))
+
+(defun frame-local--get-obarray (frame &optional create)
+  "Return the obarray associated to FRAME.
+If there is no obarray and CREATE is non-nil, a new obarray is created."
+  (setq frame (window-normalize-frame frame))
+  (if (eq frame (car frame-local--cache))
+      (cdr frame-local--cache)
+    (let ((obarray (frame-local--get-obarray-1 frame create)))
+      (when obarray
+        (setq frame-local--cache (cons frame obarray)))
+      obarray)))
 
 (defun frame-local-set (name value &optional frame)
   "Set the symbol NAME's value to VALUE in FRAME.
