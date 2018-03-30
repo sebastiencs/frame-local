@@ -62,27 +62,28 @@ If there is no obarray and CREATE is non-nil, a new obarray is created."
         obarray))))
 
 (defun frame-local-set (name value &optional frame)
-  "Set the symbol NAME's value to VALUE in the current frame.
-If FRAME is non-nil, set the symbol in this frame.
+  "Set the symbol NAME's value to VALUE in FRAME.
+If FRAME is nil, set the symbol in the current frame.
 Return VALUE."
   (let* ((obarray (frame-local--get-obarray frame t))
          (sym (intern (symbol-name name) obarray)))
     (set sym value)))
 
 (defun frame-local-get (name &optional frame)
-  "Return symbol NAME's value in the current frame or in FRAME if non-nil."
+  "Return symbol NAME's value in FRAME.
+Or in the current frame if FRAME is nil."
   (let* ((obarray (frame-local--get-obarray frame))
          (sym (and obarray (intern-soft (symbol-name name) obarray))))
     (when sym
       (symbol-value sym))))
 
 (defmacro frame-local-setq (name value &optional frame)
-  "Similar to `frame-local-set' but NAME doesn't need to be quoted.
+  "Similar to `frame-local-set' but NAME must not be quoted.
 See `frame-local-set' for the parameters VALUE and FRAME."
   `(frame-local-set ',name ,value ,frame))
 
 (defmacro frame-local-getq (name &optional frame)
-  "Similar to `frame-local-get' but NAME doesn't need to be quoted.
+  "Similar to `frame-local-get' but NAME must not be quoted.
 See `frame-local-get' for the parameter FRAME."
   `(frame-local-get ',name ,frame))
 
@@ -91,8 +92,8 @@ See `frame-local-get' for the parameter FRAME."
   (when (and (framep frame)
              (plist-member frame-local--obarrays frame))
     (let ((obarray (plist-get frame-local--obarrays frame)))
-      (setq frame-local--obarrays (delq frame frame-local--obarrays)
-            frame-local--obarrays (delq obarray frame-local--obarrays)))))
+      (setq frame-local--obarrays
+            (delq frame (delq obarray frame-local--obarrays))))))
 
 (add-hook 'delete-frame-functions 'frame-local--on-delete t)
 
