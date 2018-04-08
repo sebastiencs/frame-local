@@ -3,7 +3,7 @@
 Access variables local to a frame  
 
 You can use the functions frame-local-[set,get,setq,getq]  
-With frame-local-[setq,getq], the variables names don't need to be quoted  
+With frame-local-[setq,getq], the variables must not be quoted.  
 
 It is recommended to prefix the variables with your package name  
 to not create conflicts with variables from other packages.  
@@ -17,4 +17,4 @@ Examples:
 ```
 
 Note that the variables created with this package don't have any  
-relation with variables defined by `defvar', `defconst' etc.  
+relation with variables defined by `defvar`, `defconst` etc.  
