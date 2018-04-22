@@ -1,4 +1,5 @@
 # Frame local
+[![MELPA](http://melpa.org/packages/frame-local-badge.svg)](http://melpa.org/#/frame-local)
 
 Access variables local to a frame  
 
